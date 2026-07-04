@@ -25,7 +25,7 @@ CONFIG_SCHEMA = cv.Schema({
 }).extend(cv.COMPONENT_SCHEMA).extend(spi.spi_device_schema())
 
 
-def to_code(config):
+async def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID])
     if CONF_SEND_COMMAND_TIMES in config:
         cg.add(var.set_send_command_times(config[CONF_SEND_COMMAND_TIMES]))
@@ -38,7 +38,8 @@ def to_code(config):
             cg.add(trigger.set_address(conf[CONF_ADDRESS]))
         if CONF_DEBOUNCE in conf:
             cg.add(trigger.set_debounce(conf[CONF_DEBOUNCE]))
-        yield auto.build_automation(trigger, [(cg.uint16, 'address'), (cg.uint8, 'command')], conf)
+        await auto.build_automation(trigger, [(cg.uint16, 'address'), (cg.uint8, 'command')], conf)
 
-    yield cg.register_component(var, config)
-    yield spi.register_spi_device(var, config)
+    await cg.register_component(var, config)
+    await spi.register_spi_device(var, config)
+

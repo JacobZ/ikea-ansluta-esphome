@@ -24,10 +24,10 @@ CONFIG_SCHEMA = cv.All(light.BRIGHTNESS_ONLY_LIGHT_SCHEMA.extend({
 }).extend(cv.COMPONENT_SCHEMA))
 
 
-def to_code(config):
+async def to_code(config):
     var = cg.new_Pvariable(config[CONF_OUTPUT_ID])
-    yield cg.register_component(var, config)
-    yield light.register_light(var, config)
+    await cg.register_component(var, config)
+    await light.register_light(var, config)
 
     cg.add(var.set_address(config[CONF_ADDRESS]))
 
@@ -39,7 +39,8 @@ def to_code(config):
 
     for conf in config.get(CONF_ON_CHANGE, []):
         trigger = cg.new_Pvariable(conf[CONF_TRIGGER_ID], var)
-        yield automation.build_automation(trigger, [(cg.uint8, 'state')], conf)
+        await automation.build_automation(trigger, [(cg.uint8, 'state')], conf)
 
-    paren = yield cg.get_variable(config[CONF_IKEA_ANSLUTA_ID])
+    paren = await cg.get_variable(config[CONF_IKEA_ANSLUTA_ID])
     cg.add(var.set_parent(paren))
+
